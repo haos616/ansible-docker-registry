@@ -1,0 +1,25 @@
+home_dir: "/home"
+
+registry_ip: "127.0.0.1"
+registry_port: "5003"
+registry_user: "root"
+registry_image: "registry:2.5.1"
+registry_user_dir: "{{ home_dir }}/{{ registry_user }}"
+registry_volumes_dir: "{{ registry_user_dir }}/volumes"
+registry_configs_dir: "{{ registry_user_dir }}/configs"
+registry_letsencrypt_dir: "{{ registry_volumes_dir }}/letsencrypt"
+registry_data_dir: "{{ registry_volumes_dir }}/data"
+registry_nginx_template: "nginx.conf.j2"
+registry_container_name: "docker_registry"
+registry_ssl_certificate: "/etc/letsencrypt/live/{{ registry_server_name }}/fullchain.pem"
+registry_ssl_certificate_key: "/etc/letsencrypt/live/{{ registry_server_name }}/privkey.pem"
+registry_dhparam_dir: "{{ registry_configs_dir }}/dhparam"
+
+registry_auth_basic: true
+registry_htpasswd_file: '{{ registry_volumes_dir }}/htpasswd'
+
+registry_dirs:
+  - "{{ registry_volumes_dir }}"
+  - "{{ registry_letsencrypt_dir }}"
+  - "{{ registry_configs_dir }}"
+  - "{{ registry_dhparam_dir }}"

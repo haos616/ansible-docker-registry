@@ -1,0 +1,38 @@
+- assert:
+    that:
+     - "registry_server_name is defined"
+     - "registry_htpasswd_user is defined"
+     - "registry_htpasswd_password is defined"
+
+
+- name: Add user {{ registry_user }}
+  user: name="{{ registry_user }}" shell=/bin/bash
+
+- name: Creates directories
+  file: path="{{ item }}" owner="{{ registry_user }}" group="{{ registry_user }}" state=directory
+  with_items: "{{ registry_dirs }}"
+
+- name: install passlib
+  apt: name=python-passlib
+  when: registry_auth_basic
+
+- name: Create htpasswd {{ registry_htpasswd_file }}
+  htpasswd: path={{ registry_htpasswd_file }} name={{ registry_htpasswd_user }} password={{ registry_htpasswd_password }} crypt_scheme=md5_crypt
+  when: registry_auth_basic
+
+- name: Generate {{ registry_server_name }} nginx conf
+  template: src="{{ registry_nginx_template }}" dest=/etc/nginx/conf.d/{{ registry_server_name }}.conf
+  notify: "restart nginx"
+
+- docker_service:
+    project_name: "{{ registry_container_name }}"
+    stopped: no
+    definition:
+      version: '2'
+      services:
+        registry:
+          image: "{{ registry_image }}"
+          volumes:
+            - "{{ registry_data_dir }}:/var/lib/registry"
+          ports:
+            - "{{ registry_ip }}:{{ registry_port }}:5000"
