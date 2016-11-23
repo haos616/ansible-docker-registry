@@ -14,6 +14,9 @@
   apt: name=python-passlib
   when: registry_auth_basic
 
+- name: Remove {{ registry_htpasswd_file }}
+  file: path="{{ registry_htpasswd_file }}" state=absent
+
 - name: Create htpasswd {{ registry_htpasswd_file }}
   htpasswd: path={{ registry_htpasswd_file }} name={{ registry_htpasswd_user }} password={{ registry_htpasswd_password }} crypt_scheme=md5_crypt
   when: registry_auth_basic
