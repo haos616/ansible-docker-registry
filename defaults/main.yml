@@ -17,7 +17,10 @@ registry_dhparam_dir: "{{ registry_configs_dir }}/dhparam"
 registry_dhparam_file: "{{ registry_dhparam_dir }}/dhparam.pem"
 
 registry_auth_basic: true
-registry_htpasswd_file: '{{ registry_volumes_dir }}/htpasswd'
+registry_htpasswd_user: "admin"
+registry_password_dir: "{{ password_dir }}/{{ inventory_hostname }}/registry/{{ registry_htpasswd_user }}"
+registry_htpasswd_password: "{{lookup('password', registry_password_dir + ' length=' + password_length )}}"
+registry_htpasswd_file: '{{ registry_configs_dir }}/htpasswd'
 
 registry_dirs:
   - "{{ registry_volumes_dir }}"
