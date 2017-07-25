@@ -24,7 +24,7 @@ registy_nginx_environment:
   - "REGISTRY_USER={{ registry_auth_user }}"
   - "REGISTRY_USER_PASSWORD={{ registry_auth_user_password }}"
 
-registy_environment:
+registry_environment:
   - "REGISTRY_HTTP_RELATIVEURLS=true"
 
 registry_docker:
@@ -36,7 +36,7 @@ registry_docker:
     services:
       registry:
         image: "{{ registry_image }}"
-        environment: "{{ registy_environment }}"
+        environment: "{{ registry_environment }}"
         volumes:
           - "registry_data:/var/lib/registry"
       registry-nginx:
