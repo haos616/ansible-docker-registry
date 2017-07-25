@@ -28,9 +28,13 @@ registry_docker:
   project_name: "{{ registry_project_name }}"
   definition:
     version: "3"
+    volumes:
+      registry_data: {}
     services:
       registry:
         image: "{{ registry_image }}"
+        volumes:
+          - "registry_data:/var/lib/registry"
       registry-nginx:
         image: "{{ registry_nginx_image }}"
         environment: "{{ registy_nginx_environment }}"
