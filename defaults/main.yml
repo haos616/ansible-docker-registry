@@ -8,7 +8,7 @@ registry_nginx_image: "haos616/registry-nginx:latest"
 registry_user_dir: "{{ home_dir }}/{{ registry_user }}"
 registry_configs_dir: "{{ registry_user_dir }}/configs"
 
-registry_user: "registry"
+registry_auth_user: "registry"
 
 registry_project_name: "hub"
 
@@ -19,6 +19,11 @@ registry_dirs:
   - "{{ registry_configs_dir }}"
   - "{{ registry_docker_compose_dir }}"
 
+registy_nginx_environment:
+  - "REGISTRY_HOST=registry"
+  - "REGISTRY_USER={{ registry_auth_user }}"
+  - "REGISTRY_USER_PASSWORD={{ registry_auth_user_password }}"
+
 registry_docker:
   project_name: "{{ registry_project_name }}"
   definition:
@@ -28,10 +33,7 @@ registry_docker:
         image: "{{ registry_image }}"
       registry-nginx:
         image: "{{ registry_nginx_image }}"
-        environment:
-          - "REGISTRY_HOST=registry"
-          - "REGISTRY_USER={{ registry_user }}"
-          - "REGISTRY_USER_PASSWORD={{ registry_user_password }}"
+        environment: "{{ registy_nginx_environment }}"
         depends_on:
           - registry
         ports:
