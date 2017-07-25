@@ -1,29 +1,38 @@
-home_dir: "/home"
+home_dir: ""
 
+registry_user: "root"
 registry_ip: "127.0.0.1"
-registry_port: "5003"
-registry_user: "registry"
-registry_image: "registry:2.5.1"
+registry_port: "8004"
+registry_image: "registry:2.6.1"
+registry_nginx_image: "haos616/registry-nginx:latest"
 registry_user_dir: "{{ home_dir }}/{{ registry_user }}"
-registry_volumes_dir: "{{ registry_user_dir }}/volumes"
 registry_configs_dir: "{{ registry_user_dir }}/configs"
-registry_letsencrypt_dir: "{{ registry_volumes_dir }}/letsencrypt"
-registry_data_dir: "{{ registry_volumes_dir }}/data"
-registry_nginx_template: "nginx.conf.j2"
-registry_container_name: "docker_registry"
-registry_ssl_certificate: "/etc/letsencrypt/live/{{ registry_server_name }}/fullchain.pem"
-registry_ssl_certificate_key: "/etc/letsencrypt/live/{{ registry_server_name }}/privkey.pem"
-registry_dhparam_dir: "{{ registry_configs_dir }}/dhparam"
-registry_dhparam_file: "{{ registry_dhparam_dir }}/dhparam.pem"
 
-registry_auth_basic: true
-registry_htpasswd_user: "admin"
-registry_password_dir: "{{ password_dir }}/{{ inventory_hostname }}/registry/{{ registry_htpasswd_user }}"
-registry_htpasswd_password: "{{lookup('password', registry_password_dir + ' length=' + password_length )}}"
-registry_htpasswd_file: '{{ registry_configs_dir }}/htpasswd'
+registry_user: "registry"
+
+registry_project_name: "hub"
+
+registry_docker_compose_dir: "{{ registry_configs_dir }}/{{ registry_project_name }}"
+registry_docker_compose_file: "{{ registry_docker_compose_dir }}/docker-compose.yml"
 
 registry_dirs:
-  - "{{ registry_volumes_dir }}"
-  - "{{ registry_letsencrypt_dir }}"
   - "{{ registry_configs_dir }}"
-  - "{{ registry_dhparam_dir }}"
+  - "{{ registry_docker_compose_dir }}"
+
+registry_docker:
+  project_name: "{{ registry_project_name }}"
+  definition:
+    version: "3"
+    services:
+      registry:
+        image: "{{ registry_image }}"
+      registry-nginx:
+        image: "{{ registry_nginx_image }}"
+        environment:
+          - "REGISTRY_HOST=registry"
+          - "REGISTRY_USER={{ registry_user }}"
+          - "REGISTRY_USER_PASSWORD={{ registry_user_password }}"
+        depends_on:
+          - registry
+        ports:
+          - "{{ registry_ip }}:{{ registry_port }}:80"
